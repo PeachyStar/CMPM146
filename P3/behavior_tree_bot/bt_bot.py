@@ -1,47 +1,54 @@
 import logging, sys, os
 
-# Force path to find planet_wars.py in the folder above 
-sys.path.insert(0, os.getcwd())
+import logging, traceback, sys, os, inspect
+logging.basicConfig(filename=__file__[:-3] +'.log', filemode='w', level=logging.DEBUG)
+currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+parentdir = os.path.dirname(currentdir)
+sys.path.append(parentdir)
+
+from behavior_tree_bot.behaviors import *
+from behavior_tree_bot.checks import *
+from behavior_tree_bot.bt_nodes import Selector, Sequence, Action, Check
 
 from planet_wars import PlanetWars, finish_turn
-from behavior_tree_bot.behaviors import defend_smart, attack_high_growth
-from behavior_tree_bot.checks import if_under_attack, if_neutral_available
-from behavior_tree_bot.bt_nodes import Selector, Sequence, Action, Check
 
 def setup_behavior_tree():
     root = Selector(name='Main Strategy')
 
-    # 1. Defense (Priority 1)
+    # Defense (Priority 1)
     defense = Sequence(name='Defense')
     defense.child_nodes = [Check(if_under_attack), Action(defend_smart)]
 
-    # 2. Attack / Expansion (Priority 2)
+    # Attack / Expansion (Priority 2)
     # Using the high-growth logic to beat the Production/Spread bots
     attack = Action(attack_high_growth)
-
+    
+    #Focus on defense first, then offense
     root.child_nodes = [defense, attack]
     return root
 
-if __name__ == '__main__':
-    logging.basicConfig(filename='bt_bot.log', filemode='w', level=logging.DEBUG)
-    logging.info("Initializing Bot...")
-    try:
-        behavior_tree = setup_behavior_tree()
-        logging.info("Tree structure:\n" + behavior_tree.tree_to_string())
+# You don't need to change this function
+def do_turn(state):
+    behavior_tree.execute(planet_wars)
 
+if __name__ == '__main__':
+    logging.basicConfig(filename=__file__[:-3] + '.log', filemode='w', level=logging.DEBUG)
+
+    behavior_tree = setup_behavior_tree()
+    try:
         map_data = ''
         while True:
-            current_line = sys.stdin.readline()
-            if not current_line: break 
-            if current_line.startswith("go"):
-                state = PlanetWars(map_data)
-                behavior_tree.execute(state)
-                finish_turn() # Mandatory signal to Java 
-                
-                for handler in logging.getLogger().handlers:
-                    handler.flush()
+            current_line = input()
+            if len(current_line) >= 2 and current_line.startswith("go"):
+                planet_wars = PlanetWars(map_data)
+                do_turn(planet_wars)
+                finish_turn()
                 map_data = ''
             else:
-                map_data += current_line
-    except Exception as e:
-        logging.exception("CRITICAL ERROR IN BT_BOT:")
+                map_data += current_line + '\n'
+
+    except KeyboardInterrupt:
+        print('ctrl-c, leaving ...')
+    except Exception:
+        traceback.print_exc(file=sys.stdout)
+        logging.exception("Error in bot.")
