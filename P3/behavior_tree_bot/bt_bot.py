@@ -1,6 +1,6 @@
 import logging, sys, os
 
-# Force path to find planet_wars.py in the folder above [cite: 12, 18]
+# Force path to find planet_wars.py in the folder above 
 sys.path.insert(0, os.getcwd())
 
 from planet_wars import PlanetWars, finish_turn
@@ -36,7 +36,7 @@ if __name__ == '__main__':
             if current_line.startswith("go"):
                 state = PlanetWars(map_data)
                 behavior_tree.execute(state)
-                finish_turn() # Mandatory signal to Java [cite: 83, 85]
+                finish_turn() # Mandatory signal to Java 
                 
                 for handler in logging.getLogger().handlers:
                     handler.flush()
