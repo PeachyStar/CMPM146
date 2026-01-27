@@ -1,0 +1,6 @@
+INFO:root:
+Selector: Main Strategy
+| Sequence: Defense
+| | Check: if_under_attack
+| | Action: defend_smart
+| Action: attack_high_growth
