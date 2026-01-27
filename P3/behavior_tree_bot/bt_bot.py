@@ -25,6 +25,7 @@ def setup_behavior_tree():
     
     #Focus on defense first, then offense
     root.child_nodes = [defense, attack]
+    logging.info('\n' + root.tree_to_string())
     return root
 
 # You don't need to change this function
