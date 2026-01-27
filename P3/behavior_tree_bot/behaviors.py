@@ -2,7 +2,7 @@ import sys
 from planet_wars import issue_order
 
 def defend_smart(state):
-    # Find threatened planets and reinforce them from safe ones [cite: 58, 79]
+    # Find threatened planets and reinforce them from safe ones 
     my_planets = state.my_planets()
     enemy_fleets = state.enemy_fleets()
     for planet in my_planets:
@@ -17,7 +17,7 @@ def defend_smart(state):
     return False
 
 def attack_high_growth(state):
-    # Targets planets based on growth rate vs cost to capture [cite: 58, 72, 79]
+    # Targets planets based on growth rate vs cost to capture 
     my_planets = state.my_planets()
     if not my_planets: return False
     source = max(my_planets, key=lambda p: p.num_ships)
